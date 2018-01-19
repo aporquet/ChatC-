@@ -19,6 +19,8 @@ using namespace std;
 
 int main(){
 	const char* serverIp = "localhost";
+	char pse[100];
+
 	int port = 5555;
 	int msg_max_length = 1500;
 
@@ -31,22 +33,31 @@ int main(){
 	sendSocketAddress.sin_port = htons(port);
 
 	int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+	cout << "Entre ton pseudo : ";
+	string pseudo;
+	getline(cin, pseudo);
+	memset(&pse, 0, sizeof(pseudo));
+	strcpy(pse, pseudo.c_str());
+	
 	int connectionStatus = connect(clientSocket, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
 		return 0;
 	} else {
-		cout << "Connexion avec le serveur réussis !" << endl;
-
+		cout << "Bonjour "<< pseudo <<", connexion avec le serveur réussis !" << endl;
+		char pse[50];
 		char msg[msg_max_length];
+		cout << "Message : ";
 		while(true) {
 			string data;
 			getline(cin, data);
 			memset(&msg, 0, sizeof(msg));
 			strcpy(msg, data.c_str());
-
-			cout << "Message : " << msg << endl;
-			send(clientSocket, &msg, sizeof(msg), 0);
+			if(!strcmp(msg, "exit")){
+				cout << pseudo << " : " << msg << endl;
+				send(clientSocket, &msg, sizeof(msg), 0);
+			}
 		}
 	}
 

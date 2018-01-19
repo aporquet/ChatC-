@@ -19,11 +19,25 @@
 
 using namespace std;
 
-void thread_listen_connection_function(int serverSocket) {
-	cout << "Attente des connexion clients ... : " << endl;
+void thread_listen_msg_function (int newSd) {
+        cout << "Attente de message" << endl;
 
-	int numberRequest = 10;
-	listen(serverSocket, numberRequest);
+	while(true) {
+		char msg[1500];
+		int bytesRead, bytesWritten = 0;
+
+		memset(&msg, 0, sizeof(msg));
+	        bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
+        	if(!strcmp(msg, "exit")){
+            	cout << "Client has quit the session" << endl;
+        	} else {
+			cout << "Client: " << msg << endl;
+		}
+	}
+}
+
+void thread_listen_connection_function(int serverSocket) {
+	cout << "Attente des connexion clients ... : "  << endl;
 
         while(true) {
                 sockaddr_in newSockAddr;
@@ -34,13 +48,17 @@ void thread_listen_connection_function(int serverSocket) {
                         cerr << "Erreur tentative de connexion !" << endl;
                 } else {
                         cout << "Connexion client !" << endl;
-                }
+			thread thread_listen_msg (thread_listen_msg_function, newSd);
+                	thread_listen_msg.join();
+		}
        }
 }
 
 int main() {
 	int port = 5555;
-	int msg_max_length = 100;
+//	int msg_max_length = 100;
+	int numberRequest = 10;
+	int* allSd;
 
 	sockaddr_in addr;
 	addr.sin_addr.s_addr = INADDR_ANY;
@@ -62,9 +80,21 @@ int main() {
 		cout << "Socket initialisé !" << endl;
 	}
 
+	listen(serverSocket, numberRequest);
+
 	thread thread_listen_connection (thread_listen_connection_function, serverSocket);
 	thread_listen_connection.join();
 
+	/*memset(&msg, 0, sizeof(msg));
+        bytesRead += recv(newSd, (char*)&msg
+, sizeof(msg), 0);
+        if(!strcmp(msg, "exit"))
+        {
+            cout << "Client has quit the session" << endl;
+            break;
+        }
+        cout << "Client: " << msg << endl;
+*/
 	/*char msg[msg_max_length];         
 	while(true) {
           	string data;
@@ -77,7 +107,7 @@ int main() {
 		}
        }*/
 
-	cout<< "Coucou" << endl;
+	cout<< "END" << endl;
 
 	return 1;
 }

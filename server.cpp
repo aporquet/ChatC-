@@ -20,7 +20,7 @@
 using namespace std;
 
 void thread_listen_msg_function (int newSd) {
-        cout << "Attente de message de : " << newSd << endl;
+        cout << "Attente de message : " << endl;
 
 	while(true) {
 		char msg[1500];
@@ -31,7 +31,7 @@ void thread_listen_msg_function (int newSd) {
         	if(!strcmp(msg, "exit")){
             		cout << "Client has quit the session" << endl;
         	} else {
-			cout << "Client : " << newSd << " : "  << msg << endl;
+			cout << "Client : "  << msg << endl;
 		}
 	}
 }
@@ -83,28 +83,6 @@ int main() {
 
 	thread thread_listen_connection (thread_listen_connection_function, serverSocket);
 	thread_listen_connection.join();
-
-	/*memset(&msg, 0, sizeof(msg));
-        bytesRead += recv(newSd, (char*)&msg
-, sizeof(msg), 0);
-        if(!strcmp(msg, "exit"))
-        {
-            cout << "Client has quit the session" << endl;
-            break;
-        }
-        cout << "Client: " << msg << endl;
-*/
-	/*char msg[msg_max_length];         
-	while(true) {
-          	string data;
-             	getline(cin, data);
-             	memset(&msg, 0, sizeof(msg));
-               	strcpy(msg, data.c_str());
-
-               	if(strcmp(msg, "exit") == 0) {
-			cout << "Arrêt du serveur ..." << endl;
-		}
-       }*/
 
 	cout<< "END" << endl;
 

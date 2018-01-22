@@ -26,12 +26,14 @@ int main(){
 
 	sockaddr_in sendSocketAddress;
 	bzero((char*)&sendSocketAddress, sizeof(sendSocketAddress));
+
 	sendSocketAddress.sin_family = AF_INET;
 	sendSocketAddress.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
 	sendSocketAddress.sin_port = htons(port);
 
 	int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	int connectionStatus = connect(clientSocket, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
+
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
 		return 0;

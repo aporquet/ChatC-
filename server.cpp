@@ -19,32 +19,25 @@
 
 using namespace std;
 
-/*void *thread_listen_connection_function(void *arg){
-	cout << "Ecoute de connection ! " << endl;
-
-	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+void thread_listen_msg_function (int newSd) {
+        cout << "Attente de message de : " << newSd << endl;
 
 	while(true) {
-		sockaddr_in newSockAddr;
-                socklen_t newSockAddrSize = sizeof(newSockAddr);
+		char msg[1500];
+		int bytesRead, bytesWritten = 0;
 
-                int newSd = accept(serverSocket, (sockaddr *)&newSockAddr, &newSockAddrSize);
-                if(newSd < 0){
-                        cerr << "Erreur tentative de connexion !" << endl;
-                } else {
-                        cout << "Connexion client !" << endl;
-                }
-      }
-
-	(void) arg;
-    	pthread_exit(NULL);
-}*/
+		memset(&msg, 0, sizeof(msg));
+	        bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
+        	if(!strcmp(msg, "exit")){
+            		cout << "Client has quit the session" << endl;
+        	} else {
+			cout << "Client : " << newSd << " : "  << msg << endl;
+		}
+	}
+}
 
 void thread_listen_connection_function(int serverSocket) {
-	cout << "Attente des connexion clients ... : " << endl;
-	
-	int numberRequest = 10;
-	listen(serverSocket, numberRequest);
+	cout << "Attente des connexion clients ... : "  << endl;
 
         while(true) {
                 sockaddr_in newSockAddr;
@@ -55,16 +48,16 @@ void thread_listen_connection_function(int serverSocket) {
                         cerr << "Erreur tentative de connexion !" << endl;
                 } else {
                         cout << "Connexion client !" << endl;
-                }
+			thread thread_listen_msg (thread_listen_msg_function, newSd);
+                	thread_listen_msg.detach();
+		}
        }
 }
 
 int main() {
-	//thread thread_connection (thread_listen_connection);
-	//thread_connection.join();
-
 	int port = 5555;
-	int msg_max_length = 100;
+	int numberRequest = 10;
+	int* allSd;
 
 	sockaddr_in addr;
 	addr.sin_addr.s_addr = INADDR_ANY;
@@ -86,30 +79,21 @@ int main() {
 		cout << "Socket initialisé !" << endl;
 	}
 
+	listen(serverSocket, numberRequest);
+
 	thread thread_listen_connection (thread_listen_connection_function, serverSocket);
 	thread_listen_connection.join();
 
-/*
-	cout << "Attente des connexion clients ..." << endl;
-        listen(serverSocket, numberRequest);
-
-	while(true) {
-                sockaddr_in newSockAddr;
-                socklen_t newSockAddrSize = sizeof(newSockAddr);
-
-                int newSd = accept(serverSocket, (sockaddr *)&newSockAddr, &newSockAddrSize);
-                if(newSd < 0){
-                        cerr << "Erreur tentative de connexion !" << endl;
-                } else {
-			thread thread_connectionaaa (thread_listen_connection);
-                }
-       }*/
-
-//	if(pthread_create(&thread_listen_connection, NULL, thread_listen_connection_function, "A") == -1) {
-//		perror("pthread_create");
-//		return EXIT_FAILURE;
-  //  	}
-
+	/*memset(&msg, 0, sizeof(msg));
+        bytesRead += recv(newSd, (char*)&msg
+, sizeof(msg), 0);
+        if(!strcmp(msg, "exit"))
+        {
+            cout << "Client has quit the session" << endl;
+            break;
+        }
+        cout << "Client: " << msg << endl;
+*/
 	/*char msg[msg_max_length];         
 	while(true) {
           	string data;
@@ -122,7 +106,7 @@ int main() {
 		}
        }*/
 
-	cout<< "Coucou" << endl;
+	cout<< "END" << endl;
 
 	return 1;
 }

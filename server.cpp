@@ -20,7 +20,7 @@
 using namespace std;
 
 void thread_listen_msg_function (int newSd) {
-        cout << "Attente de message" << endl;
+        cout << "Attente de message de : " << newSd << endl;
 
 	while(true) {
 		char msg[1500];
@@ -29,9 +29,9 @@ void thread_listen_msg_function (int newSd) {
 		memset(&msg, 0, sizeof(msg));
 	        bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
         	if(!strcmp(msg, "exit")){
-            	cout << "Client has quit the session" << endl;
+            		cout << "Client has quit the session" << endl;
         	} else {
-			cout << "Client: " << msg << endl;
+			cout << "Client : " << newSd << " : "  << msg << endl;
 		}
 	}
 }
@@ -49,14 +49,13 @@ void thread_listen_connection_function(int serverSocket) {
                 } else {
                         cout << "Connexion client !" << endl;
 			thread thread_listen_msg (thread_listen_msg_function, newSd);
-                	thread_listen_msg.join();
+                	thread_listen_msg.detach();
 		}
        }
 }
 
 int main() {
 	int port = 5555;
-//	int msg_max_length = 100;
 	int numberRequest = 10;
 	int* allSd;
 

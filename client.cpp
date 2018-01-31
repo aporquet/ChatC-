@@ -19,7 +19,6 @@ using namespace std;
 
 int main(){
 	const char* serverIp = "localhost";
-	char pse[100];
 
 	int port = 5555;
 	int msg_max_length = 1500;
@@ -36,19 +35,23 @@ int main(){
 	int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	cout << "Entre ton pseudo : ";
-	string pseudo;
-	getline(cin, pseudo);
-	memset(&pse, 0, sizeof(pseudo));
-	strcpy(pse, pseudo.c_str());
-	
+	char pseudo[50];
+	string data_pseudo;
+
+	getline(cin, data_pseudo);
+	memset(&pseudo, 0, sizeof(pseudo));
+	strcpy(pseudo, data_pseudo.c_str());
+
 	int connectionStatus = connect(clientSocket, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
 
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
-		return 0;
+		return EXIT_FAILURE;
 	} else {
-		cout << "Bonjour "<< pseudo <<", connexion avec le serveur réussis !" << endl;
-		char pse[50];
+		send(clientSocket, &pseudo, sizeof(pseudo), 0);
+
+		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
+
 		char msg[msg_max_length];
 		cout << "Message : ";
 		while(true) {
@@ -56,12 +59,17 @@ int main(){
 			getline(cin, data);
 			memset(&msg, 0, sizeof(msg));
 			strcpy(msg, data.c_str());
+
 			if(!strcmp(msg, "exit")){
-				cout << pseudo << " : " << msg << endl;
+				send(clientSocket, "exit", sizeof(msg), 0);
+				break;
+			} else {
 				send(clientSocket, &msg, sizeof(msg), 0);
 			}
 		}
 	}
+
+	cout << "Deconnecté" << endl;
 
 	return 1;
 }

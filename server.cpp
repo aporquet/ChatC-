@@ -1,3 +1,4 @@
+#include <map>
 #include <arpa/inet.h>
 #include <iostream>
 #include <string>
@@ -20,8 +21,7 @@
 using namespace std;
 
 void thread_listen_msg_function (int newSd) {
-        cout << "Attente de message : " << endl;
-
+	cout << "Ecoute msg" << endl;
 	while(true) {
 		char msg[1500];
 		int bytesRead, bytesWritten = 0;
@@ -30,6 +30,7 @@ void thread_listen_msg_function (int newSd) {
 	        bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
         	if(!strcmp(msg, "exit")){
             		cout << "Client has quit the session" << endl;
+			break;
         	} else {
 			cout << "Client : "  << msg << endl;
 		}
@@ -37,9 +38,7 @@ void thread_listen_msg_function (int newSd) {
 }
 
 void thread_listen_connection_function(int serverSocket) {
-	cout << "Attente des connexion clients ... : "  << endl;
-
-        while(true) {
+	while(true) {
                 sockaddr_in newSockAddr;
                 socklen_t newSockAddrSize = sizeof(newSockAddr);
 
@@ -48,6 +47,14 @@ void thread_listen_connection_function(int serverSocket) {
                         cerr << "Erreur tentative de connexion !" << endl;
                 } else {
                         cout << "Connexion client !" << endl;
+
+			char pseudo[50];
+                	int bytesRead, bytesWritten = 0;
+
+                	memset(&pseudo, 0, sizeof(pseudo));
+                	bytesRead += recv(newSd, (char*)&pseudo, sizeof(pseudo), 0);
+
+			cout << pseudo << " vient de se connecter !" << endl;
 			thread thread_listen_msg (thread_listen_msg_function, newSd);
                 	thread_listen_msg.detach();
 		}
@@ -66,9 +73,8 @@ int main() {
 
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if(serverSocket < 0) {
-		cerr << "Erreur initialisation socket" << endl;
-	} else {
-		cout << "Socket initialisation..." << endl;
+		cerr << "Erreur initialisation serveur" << endl;
+		return EXIT_FAILURE;
 	}
 
 	int socketStatus = bind(serverSocket, (struct sockaddr*) &addr, sizeof(addr));
@@ -76,15 +82,13 @@ int main() {
 		cerr << "Erreur status adresse" << endl;
 		return EXIT_FAILURE;
 	} else {
-		cout << "Socket initialisé !" << endl;
+		cout << "Serveur initialisé !" << endl;
+
+		listen(serverSocket, numberRequest);
+
+	        thread thread_listen_connection (thread_listen_connection_function, serverSocket);
+        	thread_listen_connection.join();
 	}
-
-	listen(serverSocket, numberRequest);
-
-	thread thread_listen_connection (thread_listen_connection_function, serverSocket);
-	thread_listen_connection.join();
-
-	cout<< "END" << endl;
 
 	return 1;
 }

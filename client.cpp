@@ -14,6 +14,8 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <fstream>
+#include <ctime>                                                 
+#include <time.h>
 
 using namespace std;
 
@@ -65,6 +67,15 @@ int main(){
 			} else {
 				send(clientSocket, &msg, sizeof(msg), 0);
 			}
+
+
+  std::ofstream ofs;
+
+                        ofs.open ("logs.txt", std::ofstream::out | std::ofstream::app);
+		    	time_t secondes = time(NULL);
+    			struct tm *instant = localtime(&secondes);
+                    	ofs << instant->tm_hour << ":" << instant->tm_min << ":" << instant->tm_sec << "//" << pseudo << ":"  << msg <<  "\n";
+   			 ofs.close();
 		}
 	}
 

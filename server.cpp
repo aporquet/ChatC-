@@ -37,7 +37,7 @@ void thread_listen_msg_function (int newSd) {
 	}
 }
 
-void thread_listen_connection_function(int serverSocket) {
+void thread_listen_connection_function(int serverSocket, int *allClient, int *countClient) {
 	while(true) {
                 sockaddr_in newSockAddr;
                 socklen_t newSockAddrSize = sizeof(newSockAddr);
@@ -46,7 +46,13 @@ void thread_listen_connection_function(int serverSocket) {
                 if(newSd < 0){
                         cerr << "Erreur tentative de connexion !" << endl;
                 } else {
-                        cout << "Connexion client !" << endl;
+			allClient[*countClient] = newSd;
+			*countClient = *countClient +1;
+
+			cout << "Nombre de Client : "  << *countClient << endl;
+			for (int i=0; i < *countClient; i++) { cout << allClient[i] << endl; }
+
+//                        cout << "Connexion client !" << endl;
 
 			char pseudo[50];
                 	int bytesRead, bytesWritten = 0;
@@ -65,6 +71,8 @@ int main() {
 	int port = 5555;
 	int numberRequest = 10;
 	int* allSd;
+	int allClient[20] = {0};
+	int countClient = 0;
 
 	sockaddr_in addr;
 	addr.sin_addr.s_addr = INADDR_ANY;
@@ -86,7 +94,7 @@ int main() {
 
 		listen(serverSocket, numberRequest);
 
-	        thread thread_listen_connection (thread_listen_connection_function, serverSocket);
+	        thread thread_listen_connection (thread_listen_connection_function, serverSocket, allClient, &countClient);
         	thread_listen_connection.join();
 	}
 

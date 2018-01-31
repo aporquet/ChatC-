@@ -53,7 +53,6 @@ int main(){
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
 
 		char msg[msg_max_length];
-		cout << "Message : ";
 		while(true) {
 			string data;
 			getline(cin, data);

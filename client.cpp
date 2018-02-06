@@ -14,10 +14,23 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <fstream>
-#include <ctime>                                                 
+#include <ctime>
 #include <time.h>
+#include <thread>
 
 using namespace std;
+
+void thread_listen_msg_function(int clientSocket) {
+	while(true) {
+		char msg[1500];
+		int bytesRead, bytesWritten = 0;
+
+		memset(&msg, 0, sizeof(msg));
+		bytesRead += recv(clientSocket, (char*)&msg, sizeof(msg), 0);
+
+		cout << msg << endl;
+	}
+}
 
 int main(){
 	const char* serverIp = "localhost";
@@ -51,6 +64,10 @@ int main(){
 		return EXIT_FAILURE;
 	} else {
 		send(clientSocket, &pseudo, sizeof(pseudo), 0);
+
+		thread thread_listen_msg (thread_listen_msg_function, clientSocket);
+                thread_listen_msg.detach();
+
 
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
 

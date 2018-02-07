@@ -20,6 +20,17 @@
 
 using namespace std;
 
+void getCurrentTime(char* result) {
+    time_t secondes = time(NULL);
+    struct tm *instant = localtime(&secondes);
+
+    strcpy(result, to_string(instant->tm_hour).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_min).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_sec).c_str());
+}
+
 void thread_listen_msg_function(int clientSocket) {
 	while(true) {
 		char msg[1500];
@@ -34,7 +45,6 @@ void thread_listen_msg_function(int clientSocket) {
 
 int main(){
 	const char* serverIp = "localhost";
-
 	int port = 5555;
 	int msg_max_length = 1500;
 
@@ -71,29 +81,42 @@ int main(){
 
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
 
-		char msg[msg_max_length];
+		char message[msg_max_length];
+		char final_message[2000];
+		char currentTime[10];
+
+		ofstream file;
+		file.open ("logs.txt", ofstream::out | ofstream::app);
+
 		while(true) {
 			string data;
 			getline(cin, data);
-			memset(&msg, 0, sizeof(msg));
-			strcpy(msg, data.c_str());
+			memset(&message, 0, sizeof(message));
+			strcpy(message, data.c_str());
 
-			if(!strcmp(msg, "exit")){
-				send(clientSocket, "exit", sizeof(msg), 0);
-				break;
+			getCurrentTime(currentTime);
+
+                       	strcpy(final_message, currentTime);
+                      	strcat(final_message, " ");
+                      	strcat(final_message, pseudo);
+
+			if(!strcmp(message, "exit")){
+				strcat(final_message, " à quitté le serveur");
 			} else {
-				send(clientSocket, &msg, sizeof(msg), 0);
+				strcat(final_message, " : " );
+    				strcat(final_message, message);
 			}
 
+			send(clientSocket, &final_message, sizeof(final_message), 0);
+                    	file << final_message <<  "\n";
 
-  std::ofstream ofs;
-
-                        ofs.open ("logs.txt", std::ofstream::out | std::ofstream::app);
-		    	time_t secondes = time(NULL);
-    			struct tm *instant = localtime(&secondes);
-                    	ofs << instant->tm_hour << ":" << instant->tm_min << ":" << instant->tm_sec << "//" << pseudo << ":"  << msg <<  "\n";
-   			 ofs.close();
+			if(!strcmp(message, "exit")){
+				send(clientSocket, "exit", sizeof(message), 0);
+				break;
+			}
 		}
+
+		file.close();
 	}
 
 	cout << "Deconnecté" << endl;

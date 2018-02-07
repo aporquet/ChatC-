@@ -22,7 +22,7 @@ using namespace std;
 
 void thread_listen_msg_client_function (int currentClientId, int *allClient, int *countClient) {
 	while(true) {
-		char message[1500];
+		char message[2000];
 		int bytesRead, bytesWritten = 0;
 
 		memset(&message, 0, sizeof(message));

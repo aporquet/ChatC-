@@ -1,21 +1,8 @@
 #include <iostream>
-#include <string>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <netdb.h>
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 #include <fstream>
-#include <ctime>
-#include <time.h>
 #include <thread>
 
 using namespace std;
@@ -31,15 +18,15 @@ void getCurrentTime(char* result) {
     strcat(result, to_string(instant->tm_sec).c_str());
 }
 
-void thread_listen_msg_function(int clientSocket) {
+void thread_listen_msg_function(int serverId) {
 	while(true) {
-		char msg[1500];
+		char message[2000];
 		int bytesRead, bytesWritten = 0;
 
-		memset(&msg, 0, sizeof(msg));
-		bytesRead += recv(clientSocket, (char*)&msg, sizeof(msg), 0);
+		memset(&message, 0, sizeof(message));
+		bytesRead += recv(serverId, (char*)&message, sizeof(message), 0);
 
-		cout << msg << endl;
+		cout << message << endl;
 	}
 }
 
@@ -57,7 +44,7 @@ int main(){
 	sendSocketAddress.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
 	sendSocketAddress.sin_port = htons(port);
 
-	int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+	int serverId = socket(AF_INET, SOCK_STREAM, 0);
 
 	cout << "Entre ton pseudo : ";
 	char pseudo[50];
@@ -67,26 +54,33 @@ int main(){
 	memset(&pseudo, 0, sizeof(pseudo));
 	strcpy(pseudo, data_pseudo.c_str());
 
-	int connectionStatus = connect(clientSocket, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
+	int connectionStatus = connect(serverId, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
 
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
 		return EXIT_FAILURE;
 	} else {
-		send(clientSocket, &pseudo, sizeof(pseudo), 0);
-
-		thread thread_listen_msg (thread_listen_msg_function, clientSocket);
+		thread thread_listen_msg (thread_listen_msg_function, serverId);
                 thread_listen_msg.detach();
 
-
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
+
+                ofstream file;
+                file.open ("logs.txt", ofstream::out | ofstream::app);
 
 		char message[msg_max_length];
 		char final_message[2000];
 		char currentTime[10];
 
-		ofstream file;
-		file.open ("logs.txt", ofstream::out | ofstream::app);
+		getCurrentTime(currentTime);
+		strcpy(final_message, currentTime);
+                strcat(final_message, " ");
+               	strcat(final_message, pseudo);
+		strcat(final_message, " vient de se connecter !");
+
+		send(serverId, &final_message, sizeof(final_message), 0);
+              	file << final_message <<  "\n";
+              	file.flush();
 
 		while(true) {
 			string data;
@@ -107,11 +101,12 @@ int main(){
     				strcat(final_message, message);
 			}
 
-			send(clientSocket, &final_message, sizeof(final_message), 0);
+			send(serverId, &final_message, sizeof(final_message), 0);
                     	file << final_message <<  "\n";
+			file.flush();
 
 			if(!strcmp(message, "exit")){
-				send(clientSocket, "exit", sizeof(message), 0);
+				send(serverId, "exit", sizeof(message), 0);
 				break;
 			}
 		}
@@ -119,7 +114,7 @@ int main(){
 		file.close();
 	}
 
-	cout << "Deconnecté" << endl;
+	cout << "Deconnecté !" << endl;
 
 	return 1;
 }

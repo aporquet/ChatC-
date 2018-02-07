@@ -1,24 +1,22 @@
-#include <map>
-#include <arpa/inet.h>
 #include <iostream>
-#include <string>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <netdb.h>
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 #include <fstream>
-#include <pthread.h>
 #include <thread>
 
 using namespace std;
+
+void getCurrentTime(char* result) {
+    time_t secondes = time(NULL);
+    struct tm *instant = localtime(&secondes);
+
+    strcpy(result, to_string(instant->tm_hour).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_min).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_sec).c_str());
+}
+
 
 void thread_listen_msg_client_function (int currentClientId, int *allClient, int *countClient) {
 	while(true) {
@@ -28,10 +26,15 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 		memset(&message, 0, sizeof(message));
 	        bytesRead += recv(currentClientId, (char*)&message, sizeof(message), 0);
 
-		for (int index = 0; index < *countClient; index++) {
-			if (allClient[index] != currentClientId) {
-				send(allClient[index], message, sizeof(message), 0);
+		if(strcmp(message, "exit")) {
+			for (int index = 0; index < *countClient; index++) {
+				if (allClient[index] != currentClientId) {
+					send(allClient[index], message, sizeof(message), 0);
+				}
 			}
+		} else {
+			*countClient = *countClient - 1;
+			break;
 		}
 	}
 }
@@ -47,14 +50,6 @@ void thread_listen_client_connection_function(int serverId, int *allClient, int 
                 } else {
 			allClient[*countClient] = newClientId;
 			*countClient = *countClient +1;
-
-			char pseudo[50];
-                	int bytesRead, bytesWritten = 0;
-
-                	memset(&pseudo, 0, sizeof(pseudo));
-                	bytesRead += recv(newClientId, (char*)&pseudo, sizeof(pseudo), 0);
-
-			cout << pseudo << " vient de se connecter !" << endl;
 
 			thread thread_listen_client_msg (thread_listen_msg_client_function, newClientId, allClient, countClient);
                 	thread_listen_client_msg.detach();

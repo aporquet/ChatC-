@@ -7,6 +7,7 @@
 
 using namespace std;
 
+/* Get current time "hh:mm:ss" in result */
 void getCurrentTime(char* result) {
     time_t secondes = time(NULL);
     struct tm *instant = localtime(&secondes);
@@ -37,6 +38,7 @@ int main(){
 
 	struct hostent* host = gethostbyname(serverIp);
 
+	/* Init sokcet config */
 	sockaddr_in sendSocketAddress;
 	bzero((char*)&sendSocketAddress, sizeof(sendSocketAddress));
 
@@ -46,6 +48,7 @@ int main(){
 
 	int serverId = socket(AF_INET, SOCK_STREAM, 0);
 
+	/* Ask and save pseudo user*/
 	cout << "Entre ton pseudo : ";
 	char pseudo[50];
 	string data_pseudo;
@@ -54,17 +57,20 @@ int main(){
 	memset(&pseudo, 0, sizeof(pseudo));
 	strcpy(pseudo, data_pseudo.c_str());
 
+	/* client connection to server */
 	int connectionStatus = connect(serverId, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
 
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
 		return EXIT_FAILURE;
 	} else {
+		/*connection ok --> thread who listen server message */
 		thread thread_listen_msg (thread_listen_msg_function, serverId);
                 thread_listen_msg.detach();
 
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
 
+		/* prepare logs file */
                 ofstream file;
                 file.open ("logs.txt", ofstream::out | ofstream::app);
 
@@ -106,10 +112,12 @@ int main(){
     				strcat(final_message, message);
 			}
 
+			/* Send to server and white in logs file the format message */
 			send(serverId, &final_message, sizeof(final_message), 0);
                     	file << final_message <<  "\n";
 			file.flush();
 
+			/* If exit */
 			if(!strcmp(message, "exit")){
 				send(serverId, "exit", sizeof(message), 0);
 				break;

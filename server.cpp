@@ -1,22 +1,9 @@
 #include <iostream>
 #include <string.h>
 #include <netdb.h>
-#include <fstream>
 #include <thread>
 
 using namespace std;
-
-void getCurrentTime(char* result) {
-    time_t secondes = time(NULL);
-    struct tm *instant = localtime(&secondes);
-
-    strcpy(result, to_string(instant->tm_hour).c_str());
-    strcat(result, ":");
-    strcat(result, to_string(instant->tm_min).c_str());
-    strcat(result, ":");
-    strcat(result, to_string(instant->tm_sec).c_str());
-}
-
 
 void thread_listen_msg_client_function (int currentClientId, int *allClient, int *countClient) {
 	while(true) {
@@ -26,6 +13,7 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 		memset(&message, 0, sizeof(message));
 	        bytesRead += recv(currentClientId, (char*)&message, sizeof(message), 0);
 
+		/* If not exit, send message for all user Else remove user and exit this thread */
 		if(strcmp(message, "exit")) {
 			for (int index = 0; index < *countClient; index++) {
 				if (allClient[index] != currentClientId) {
@@ -45,6 +33,8 @@ void thread_listen_client_connection_function(int serverId, int *allClient, int 
                 socklen_t newSockAddrSize = sizeof(newSockAddr);
 
                 int newClientId = accept(serverId, (sockaddr *)&newSockAddr, &newSockAddrSize);
+
+		/* If connection, add one client and save clientId. Add new thread for each new client to listen his message */
                 if(newClientId < 0){
                         cerr << "Erreur tentative de connexion !" << endl;
                 } else {
@@ -64,6 +54,7 @@ int main() {
 	int allClient[20] = {0};
 	int countClient = 0;
 
+	/* Init socket config */
 	sockaddr_in addr;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(port);
@@ -84,6 +75,7 @@ int main() {
 
 			listen(serverId, numberRequest);
 
+			/* Thread Listen connection */
 	        	thread thread_listen_client_connection (thread_listen_client_connection_function, serverId, allClient, &countClient);
         		thread_listen_client_connection.join();
 	}

@@ -73,10 +73,12 @@ int main(){
 		char currentTime[10];
 
 		getCurrentTime(currentTime);
-		strcpy(final_message, currentTime);
+		strcpy(final_message, "\033[32m");
+		strcat(final_message, currentTime);
                 strcat(final_message, " ");
                	strcat(final_message, pseudo);
 		strcat(final_message, " vient de se connecter !");
+		strcat(final_message, "\033[0m");
 
 		send(serverId, &final_message, sizeof(final_message), 0);
               	file << final_message <<  "\n";
@@ -90,13 +92,16 @@ int main(){
 
 			getCurrentTime(currentTime);
 
-                       	strcpy(final_message, currentTime);
-                      	strcat(final_message, " ");
-                      	strcat(final_message, pseudo);
-
 			if(!strcmp(message, "exit")){
-				strcat(final_message, " à quitté le serveur");
+				strcpy(final_message, "\033[31m");
+				strcat(final_message, currentTime);
+                        	strcat(final_message, " ");
+                        	strcat(final_message, pseudo);
+				strcat(final_message, " à quitté le serveur \033[0m");
 			} else {
+				strcpy(final_message, currentTime);
+                        	strcat(final_message, " ");
+                        	strcat(final_message, pseudo);
 				strcat(final_message, " : " );
     				strcat(final_message, message);
 			}

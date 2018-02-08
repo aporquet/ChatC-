@@ -2,10 +2,26 @@
 #include <string.h>
 #include <netdb.h>
 #include <thread>
+#include <fstream>
 
 using namespace std;
 
+/* Get current time "hh:mm:ss" in result */
+void getCurrentTime(char* result) {
+    time_t secondes = time(NULL);
+    struct tm *instant = localtime(&secondes);
+
+    strcpy(result, to_string(instant->tm_hour).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_min).c_str());
+    strcat(result, ":");
+    strcat(result, to_string(instant->tm_sec).c_str());
+}
+
 void thread_listen_msg_client_function (int currentClientId, int *allClient, int *countClient) {
+	ofstream file;
+      	file.open ("logs.txt", ofstream::out | ofstream::app);
+
 	while(true) {
 		char message[2000];
 		int bytesRead, bytesWritten = 0;
@@ -13,11 +29,20 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 		memset(&message, 0, sizeof(message));
 	        bytesRead += recv(currentClientId, (char*)&message, sizeof(message), 0);
 
+		char final_message[2000];
+		char currentTime[10];
+
+		getCurrentTime(currentTime);
+		strcpy(final_message, currentTime);
+		strcat(final_message, " ");
+		strcat(final_message, message);
+
 		/* If not exit, send message for all user Else remove user and exit this thread */
 		if(strcmp(message, "exit")) {
+			file << final_message << endl;
 			for (int index = 0; index < *countClient; index++) {
 				if (allClient[index] != currentClientId) {
-					send(allClient[index], message, sizeof(message), 0);
+					send(allClient[index], final_message, sizeof(final_message), 0);
 				}
 			}
 		} else {
@@ -25,6 +50,8 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 			break;
 		}
 	}
+
+	file.close();
 }
 
 void thread_listen_client_connection_function(int serverId, int *allClient, int *countClient) {

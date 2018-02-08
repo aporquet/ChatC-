@@ -7,18 +7,6 @@
 
 using namespace std;
 
-/* Get current time "hh:mm:ss" in result */
-void getCurrentTime(char* result) {
-    time_t secondes = time(NULL);
-    struct tm *instant = localtime(&secondes);
-
-    strcpy(result, to_string(instant->tm_hour).c_str());
-    strcat(result, ":");
-    strcat(result, to_string(instant->tm_min).c_str());
-    strcat(result, ":");
-    strcat(result, to_string(instant->tm_sec).c_str());
-}
-
 void thread_listen_msg_function(int serverId) {
 	while(true) {
 		char message[2000];
@@ -57,14 +45,14 @@ int main(){
 	memset(&pseudo, 0, sizeof(pseudo));
 	strcpy(pseudo, data_pseudo.c_str());
 
-	/* client connection to server */
+	/* Client connection to server */
 	int connectionStatus = connect(serverId, (sockaddr*) &sendSocketAddress, sizeof(sendSocketAddress));
 
 	if(connectionStatus < 0) {
 		cerr << "Erreur de connexion!" << endl;
 		return EXIT_FAILURE;
 	} else {
-		/*connection ok --> thread who listen server message */
+		/* Connection ok --> thread who listen server message */
 		thread thread_listen_msg (thread_listen_msg_function, serverId);
                 thread_listen_msg.detach();
 
@@ -78,17 +66,12 @@ int main(){
 		char final_message[2000];
 		char currentTime[10];
 
-		getCurrentTime(currentTime);
 		strcpy(final_message, "\033[32m");
-		strcat(final_message, currentTime);
-                strcat(final_message, " ");
                	strcat(final_message, pseudo);
 		strcat(final_message, " vient de se connecter !");
 		strcat(final_message, "\033[0m");
 
 		send(serverId, &final_message, sizeof(final_message), 0);
-              	file << final_message <<  "\n";
-              	file.flush();
 
 		while(true) {
 			string data;
@@ -96,26 +79,18 @@ int main(){
 			memset(&message, 0, sizeof(message));
 			strcpy(message, data.c_str());
 
-			getCurrentTime(currentTime);
-
 			if(!strcmp(message, "exit")){
 				strcpy(final_message, "\033[31m");
-				strcat(final_message, currentTime);
-                        	strcat(final_message, " ");
                         	strcat(final_message, pseudo);
 				strcat(final_message, " à quitté le serveur \033[0m");
 			} else {
-				strcpy(final_message, currentTime);
-                        	strcat(final_message, " ");
-                        	strcat(final_message, pseudo);
+                        	strcpy(final_message, pseudo);
 				strcat(final_message, " : " );
     				strcat(final_message, message);
 			}
 
 			/* Send to server and white in logs file the format message */
 			send(serverId, &final_message, sizeof(final_message), 0);
-                    	file << final_message <<  "\n";
-			file.flush();
 
 			/* If exit */
 			if(!strcmp(message, "exit")){

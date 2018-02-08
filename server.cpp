@@ -41,9 +41,9 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 		if(strcmp(message, "exit")) {
 			file << final_message << endl;
 			for (int index = 0; index < *countClient; index++) {
-				if (allClient[index] != currentClientId) {
+//				if (allClient[index] != currentClientId) {
 					send(allClient[index], final_message, sizeof(final_message), 0);
-				}
+//				}
 			}
 		} else {
 			*countClient = *countClient - 1;

@@ -18,10 +18,18 @@ void thread_listen_msg_function(int serverId) {
 	}
 }
 
-int main(){
-	const char* serverIp = "localhost";
-	int port = 5555;
+int main(int argc, char *argv[]){
+	const char* serverIp = argv[1] ? argv[1] : "localhost";
+	int port = argv[2] != "XDG_VTNR=7" ? atoi(argv[2]) : 5555;
 	int msg_max_length = 1500;
+
+	if(argv[2]) {
+		cout << "IF" << endl;
+	} else {
+		cout << "ELSE" << endl;
+	}
+	cout << argv[2] << endl;
+	cout << serverIp << ":" << port << endl;
 
 	struct hostent* host = gethostbyname(serverIp);
 

@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <thread>
 #include <fstream>
+#include <typeinfo>
 
 using namespace std;
 
@@ -74,8 +75,8 @@ void thread_listen_client_connection_function(int serverId, int *allClient, int 
        }
 }
 
-int main() {
-	int port = 5555;
+int main(int argc, char *argv[]) {
+	int port = argv[1] ? atoi(argv[1]) : 5555;
 	int numberRequest = 10;
 	int* allSd;
 	int allClient[20] = {0};
@@ -98,7 +99,7 @@ int main() {
 		cerr << "Erreur status adresse" << endl;
 			return EXIT_FAILURE;
 		} else {
-			cout << "Serveur initialisé !" << endl;
+			cout << "Serveur initialisé sur le port " << port << " !" << endl;
 
 			listen(serverId, numberRequest);
 

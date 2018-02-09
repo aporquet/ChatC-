@@ -10,6 +10,21 @@ void playSound() {
 	system("paplay /usr/share/sounds/gnome/default/alerts/drip.ogg");
 }
 
+void showNotif(char *message) {
+	char final_command[2100];
+	char title[4] = "IRC";
+
+	strcpy(final_command, "notify-send \"");
+	strcat(final_command, title);
+	strcat(final_command, "\" \"");
+	strcat(final_command, message);
+	strcat(final_command, "\"");
+
+	cout << final_command << endl;
+
+	system(final_command);
+}
+
 void thread_listen_msg_function(int serverId) {
 	while(true) {
 		char message[2000];
@@ -19,6 +34,7 @@ void thread_listen_msg_function(int serverId) {
 		bytesRead += recv(serverId, (char*)&message, sizeof(message), 0);
 
 		cout << message << endl;
+		showNotif(message);
 		playSound();
 	}
 }

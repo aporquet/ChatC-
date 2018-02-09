@@ -32,11 +32,9 @@ void thread_listen_msg_function(int serverId) {
 		memset(&message, 0, sizeof(message));
 		bytesRead += recv(serverId, (char*)&message, sizeof(message), 0);
 
-		if(strcmp(message, "")) {
-			cout << message << endl;
-			showNotif(message);
-			playSound();
-		}
+		cout << message << endl;
+		showNotif(message);
+		playSound();
 	}
 }
 
@@ -99,6 +97,7 @@ int main(int argc, char *argv[]){
 			memset(&message, 0, sizeof(message));
 			strcpy(message, data.c_str());
 
+			if(strcmp(message, "")) {
 			if(!strcmp(message, "exit")){
 				strcpy(final_message, "\033[31m");
                         	strcat(final_message, pseudo);
@@ -117,6 +116,7 @@ int main(int argc, char *argv[]){
 				send(serverId, "exit", sizeof(message), 0);
 				break;
 			}
+}
 		}
 	}
 

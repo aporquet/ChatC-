@@ -4,6 +4,7 @@
 #include <netdb.h>
 #include <thread>
 
+
 using namespace std;
 
 void playSound() {
@@ -39,7 +40,7 @@ void thread_listen_msg_function(int serverId) {
 
 int main(int argc, char *argv[]){
 	const char* defaultIp = "localhost";
-	int defaultPort = 5555;
+	int defaultPort = 5001;
 
 	const char* serverIp = argc >= 2 ? argv[1] : defaultIp;
 	int port = argc >= 3 ? atoi(argv[2]) : defaultPort;

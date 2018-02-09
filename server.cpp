@@ -75,7 +75,7 @@ void thread_listen_client_connection_function(int serverId, int *allClient, int 
 }
 
 int main(int argc, char *argv[]) {
-	int defaultPort = 5555;
+	int defaultPort = 5001;
 
 	int port = argc >= 2 ? atoi(argv[1]) : defaultPort;
 	int numberRequest = 10;

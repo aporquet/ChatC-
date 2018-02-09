@@ -3,7 +3,6 @@
 #include <netdb.h>
 #include <thread>
 #include <fstream>
-#include <typeinfo>
 
 using namespace std;
 
@@ -76,7 +75,9 @@ void thread_listen_client_connection_function(int serverId, int *allClient, int 
 }
 
 int main(int argc, char *argv[]) {
-	int port = argv[1] ? atoi(argv[1]) : 5555;
+	int defaultPort = 5555;
+
+	int port = argc >= 2 ? atoi(argv[1]) : defaultPort;
 	int numberRequest = 10;
 	int* allSd;
 	int allClient[20] = {0};

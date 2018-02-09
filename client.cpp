@@ -19,20 +19,17 @@ void thread_listen_msg_function(int serverId) {
 }
 
 int main(int argc, char *argv[]){
-	const char* serverIp = argv[1] ? argv[1] : "localhost";
-	int port = argv[2] != "XDG_VTNR=7" ? atoi(argv[2]) : 5555;
-	int msg_max_length = 1500;
+	const char* defaultIp = "localhost";
+	int defaultPort = 5555;
 
-	if(argv[2]) {
-		cout << "IF" << endl;
-	} else {
-		cout << "ELSE" << endl;
-	}
-	cout << argv[2] << endl;
-	cout << serverIp << ":" << port << endl;
+	const char* serverIp = argc >= 2 ? argv[1] : defaultIp;
+	int port = argc >= 3 ? atoi(argv[2]) : defaultPort;
+	int msg_max_length = 1500;
 
 	struct hostent* host = gethostbyname(serverIp);
 
+	cout << serverIp << endl;
+	cout << port << endl;
 	/* Init sokcet config */
 	sockaddr_in sendSocketAddress;
 	bzero((char*)&sendSocketAddress, sizeof(sendSocketAddress));

@@ -20,7 +20,7 @@ void showNotif(char *message) {
 	strcat(final_command, message);
 	strcat(final_command, "\"");
 
-	cout << final_command << endl;
+	
 
 	system(final_command);
 }

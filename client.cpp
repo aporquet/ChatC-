@@ -58,10 +58,6 @@ int main(){
 
 		cout << "Bonjour " << pseudo << ", connexion avec le serveur réussis !" << endl;
 
-		/* prepare logs file */
-                ofstream file;
-                file.open ("logs.txt", ofstream::out | ofstream::app);
-
 		char message[msg_max_length];
 		char final_message[2000];
 		char currentTime[10];
@@ -98,8 +94,6 @@ int main(){
 				break;
 			}
 		}
-
-		file.close();
 	}
 
 	cout << "Deconnecté !" << endl;

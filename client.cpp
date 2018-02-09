@@ -32,7 +32,7 @@ void thread_listen_msg_function(int serverId) {
 		memset(&message, 0, sizeof(message));
 		bytesRead += recv(serverId, (char*)&message, sizeof(message), 0);
 
-		if(strcmp(message, "") {
+		if(strcmp(message, "")) {
 			cout << message << endl;
 			showNotif(message);
 			playSound();

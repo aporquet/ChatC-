@@ -30,28 +30,26 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 	        bytesRead += recv(currentClientId, (char*)&message, sizeof(message), 0);
 		
 		if(strcmp(message, "")){
-		cout << message << endl;
-                cout << strcmp(message, "") << endl;
-		char final_message[2000];
-		char currentTime[10];
+			char final_message[2000];
+			char currentTime[10];
 
-		getCurrentTime(currentTime);
-		strcpy(final_message, currentTime);
-		strcat(final_message, " ");
-		strcat(final_message, message);
+			getCurrentTime(currentTime);
+			strcpy(final_message, currentTime);
+			strcat(final_message, " ");
+			strcat(final_message, message);
 
-		/* If not exit, send message for all user Else remove user and exit this thread */
-		if(strcmp(message, "exit")) {
-			file << final_message << endl;
-			for (int index = 0; index < *countClient; index++) {
-//				if (allClient[index] != currentClientId) {
-					send(allClient[index], final_message, sizeof(final_message), 0);
-//				}
+			/* If not exit, send message for all user Else remove user and exit this thread */
+			if(strcmp(message, "exit")) {
+				file << final_message << endl;
+				for (int index = 0; index < *countClient; index++) {
+//					if (allClient[index] != currentClientId) {
+						send(allClient[index], final_message, sizeof(final_message), 0);
+//					}
+				}
+			} else {
+				*countClient = *countClient - 1;
+				break;
 			}
-		} else {
-			*countClient = *countClient - 1;
-			break;
-		}
 		}
 	}
 

@@ -28,7 +28,10 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 
 		memset(&message, 0, sizeof(message));
 	        bytesRead += recv(currentClientId, (char*)&message, sizeof(message), 0);
-
+		
+		if(strcmp(message, "")){
+		cout << message << endl;
+                cout << strcmp(message, "") << endl;
 		char final_message[2000];
 		char currentTime[10];
 
@@ -48,6 +51,7 @@ void thread_listen_msg_client_function (int currentClientId, int *allClient, int
 		} else {
 			*countClient = *countClient - 1;
 			break;
+		}
 		}
 	}
 

@@ -20,8 +20,6 @@ void showNotif(char *message) {
 	strcat(final_command, message);
 	strcat(final_command, "\"");
 
-	
-
 	system(final_command);
 }
 

@@ -6,6 +6,10 @@
 
 using namespace std;
 
+void playSound() {
+	system("paplay /usr/share/sounds/gnome/default/alerts/drip.ogg");
+}
+
 void thread_listen_msg_function(int serverId) {
 	while(true) {
 		char message[2000];
@@ -15,6 +19,7 @@ void thread_listen_msg_function(int serverId) {
 		bytesRead += recv(serverId, (char*)&message, sizeof(message), 0);
 
 		cout << message << endl;
+		playSound();
 	}
 }
 
@@ -28,8 +33,6 @@ int main(int argc, char *argv[]){
 
 	struct hostent* host = gethostbyname(serverIp);
 
-	cout << serverIp << endl;
-	cout << port << endl;
 	/* Init sokcet config */
 	sockaddr_in sendSocketAddress;
 	bzero((char*)&sendSocketAddress, sizeof(sendSocketAddress));

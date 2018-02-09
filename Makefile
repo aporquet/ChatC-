@@ -1,10 +1,4 @@
-server: server.cpp
-	g++ server.cpp -o server -std=c++11 -lpthread
-
-client: client.cpp
-	g++ client.cpp -o client -std=c++11 -lpthread
-
-all: server.cpp client.cpp
+locale: server.cpp client.cpp
 	g++ server.cpp -o server -std=c++11 -lpthread
 	g++ client.cpp -o client -std=c++11 -lpthread
 	gnome-terminal -e 'sh -c ./server'
@@ -13,3 +7,11 @@ all: server.cpp client.cpp
 	gnome-terminal -e 'sh -c ./client'
 	gnome-terminal -e 'sh -c ./client'
 
+distant:
+	echo ${Greg}
+		
+server: server.cpp
+	g++ server.cpp -o server -std=c++11 -lpthread
+
+client: client.cpp
+	g++ client.cpp -o client -std=c++11 -lpthread
